@@ -23,6 +23,8 @@ var OPTIONS = [
   "requirePragma",
   "proseWrap",
   "arrowParens",
+  "rangeStart",
+  "rangeEnd",
   "doc",
   "ast",
   "output2"
@@ -194,6 +196,9 @@ window.onload = function() {
 
 function setOptions(options) {
   OPTIONS.forEach(function(option) {
+    if (option === undefined) {
+      return;
+    }
     var elem = document.getElementById(option);
     if (elem.tagName === "SELECT") {
       elem.value = options[option];
