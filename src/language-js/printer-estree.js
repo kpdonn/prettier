@@ -125,14 +125,21 @@ function genericPrint(path, options, printPath, args) {
   }
 
   const parts = [];
-  if (needsParens) {
-    parts.unshift("(");
-  }
-
-  parts.push(linesWithoutParens);
+  const parent = path.getParentNode();
+  const parentParent = path.getParentNode(1);
+  const parentParentParent = path.getParentNode(2);
 
   if (needsParens) {
-    parts.push(")");
+    let linesInsideParens = linesWithoutParens;
+    if (parent.type === "LogicalExpression" && breakIndentParens(node)) {
+      linesInsideParens = ifBreak(
+        concat([indent(concat([softline, linesWithoutParens])), softline]),
+        linesWithoutParens
+      );
+    }
+    parts.push(group(concat(["(", linesInsideParens, ")"])));
+  } else {
+    parts.push(linesWithoutParens);
   }
 
   if (decorators.length > 0) {
@@ -143,6 +150,16 @@ function genericPrint(path, options, printPath, args) {
 
 function hasPrettierIgnore(path) {
   return privateUtil.hasIgnoreComment(path) || hasJsxIgnoreComment(path);
+}
+
+function breakIndentParens(node) {
+  return (
+    node.type === "LogicalExpression" &&
+    (node.right.type === "BinaryExpression" ||
+      node.right.type === "LogicalExpression" ||
+      node.right.type === "UnaryExpression" ||
+      node.right.type === "CallExpression")
+  );
 }
 
 function hasJsxIgnoreComment(path) {
@@ -437,6 +454,7 @@ function printPathNoParens(path, options, print, args) {
       // Avoid indenting sub-expressions in some cases where the first sub-expression is already
       // indented accordingly. We should indent sub-expressions where the first case isn't indented.
       const shouldNotIndent =
+        (parent.type === "LogicalExpression" && breakIndentParens(n)) ||
         parent.type === "ReturnStatement" ||
         (parent.type === "JSXExpressionContainer" &&
           parentParent.type === "JSXAttribute") ||
