@@ -1424,7 +1424,8 @@ function printPathNoParens(path, options, print, args) {
         " =",
         n.init,
         n.init && path.call(print, "init"),
-        options
+        options,
+        n.typeParameters
       );
     case "WithStatement":
       return group(
@@ -4821,13 +4822,15 @@ function printAssignment(
   operator,
   rightNode,
   printedRight,
-  options
+  options,
+  typeParameters
 ) {
   if (!rightNode) {
     return printedLeft;
   }
 
   const canBreak =
+    (!!typeParameters && rightNode.type === "TSFunctionType") ||
     (isBinaryish(rightNode) && !shouldInlineLogicalExpression(rightNode)) ||
     (rightNode.type === "ConditionalExpression" &&
       isBinaryish(rightNode.test) &&
