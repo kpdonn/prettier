@@ -109,13 +109,20 @@ const line = { type: "line" };
 const softline = { type: "line", soft: true };
 const hardline = concat([{ type: "line", hard: true }, breakParent]);
 
-function optionalLine(lineType, contents) {
+function chooseGroup(primaryGroup, alternateGroup, linesToCheck, switchRatio, altPenalty) {
   if (process.env.NODE_ENV !== "production") {
-    assertDoc(lineType);
-    assertDoc(contents);
+    assertDoc(primaryGroup);
+    assertDoc(alternateGroup);
   }
 
-  return { type: "optionalLine", contents, lineType };
+  return {
+    type: "chooseGroup",
+    primaryGroup,
+    alternateGroup,
+    linesToCheck,
+    switchRatio,
+    altPenalty
+  };
 }
 
 const literalline = concat([
@@ -160,7 +167,7 @@ module.exports = {
   line,
   softline,
   hardline,
-  optionalLine,
+  chooseGroup,
   literalline,
   group,
   conditionalGroup,

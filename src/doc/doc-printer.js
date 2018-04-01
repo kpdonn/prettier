@@ -192,12 +192,8 @@ function fits(next, restCommands, width, options, mustBeFlat) {
               return true;
           }
           break;
-        case "optionalLine":
-          cmds.push([ind, mode, doc.contents]);
-          if (!doc.soft) {
-            width -= 1;
-          }
-
+        case "chooseGroup":
+          cmds.push([ind, mode, doc.primaryGroup]);
           break;
       }
     }
@@ -494,34 +490,34 @@ function printDocToString(doc, options) {
               break;
           }
           break;
-        case "optionalLine":
+        case "chooseGroup":
           if (mode === MODE_FLAT) {
-            cmds.push([ind, mode, concat([doc.lineType, doc.contents])]);
+            cmds.push([ind, mode, doc.primaryGroup]);
           }
           if (mode === MODE_BREAK) {
-            const noBreakCommand = noOptionalBreakCmd(ind, mode, doc);
-            const breakCommand = optionalBreakCmd(ind, mode, doc);
+            const priCmd = [ind, mode, doc.primaryGroup];
+            const altCmd = [ind, mode, doc.alternateGroup];
 
-            const amountWithoutBreak = amountPrintedBeforeNumBreaks(
-              noBreakCommand,
+            const priAmount = amountPrintedBeforeNumBreaks(
+              priCmd,
               cmds,
               width,
               pos,
               options,
-              2
+              doc.linesToCheck
             );
-            const amountWithBreak = amountPrintedBeforeNumBreaks(
-              breakCommand,
+            const altAmount = amountPrintedBeforeNumBreaks(
+              altCmd,
               cmds,
               width,
-              ind.length,
+              pos,
               options,
-              2
+              doc.linesToCheck
             );
-            if (amountWithBreak - 2 > amountWithoutBreak) {
-              cmds.push(breakCommand);
+            if (priAmount >= (altAmount - doc.altPenalty) / doc.switchRatio) {
+              cmds.push(priCmd);
             } else {
-              cmds.push(noBreakCommand);
+              cmds.push(altCmd);
             }
           }
           break;
@@ -815,34 +811,34 @@ function amountPrintedBeforeNumBreaks(
           }
           break;
 
-        case "optionalLine":
+        case "chooseGroup":
           if (mode === MODE_FLAT) {
-            cmds.push([ind, mode, concat([doc.lineType, doc.contents])]);
+            cmds.push([ind, mode, doc.primaryGroup]);
           }
           if (mode === MODE_BREAK) {
-            const noBreakCommand = noOptionalBreakCmd(ind, mode, doc);
-            const breakCommand = optionalBreakCmd(ind, mode, doc);
+            const priCmd = [ind, mode, doc.primaryGroup];
+            const altCmd = [ind, mode, doc.alternateGroup];
 
-            const amountWithoutBreak = amountPrintedBeforeNumBreaks(
-              noBreakCommand,
+            const priAmount = amountPrintedBeforeNumBreaks(
+              priCmd,
               cmds,
               width,
               pos,
               options,
-              2
+              doc.linesToCheck
             );
-            const amountWithBreak = amountPrintedBeforeNumBreaks(
-              breakCommand,
+            const altAmount = amountPrintedBeforeNumBreaks(
+              altCmd,
               cmds,
               width,
-              ind.length,
+              pos,
               options,
-              2
+              doc.linesToCheck
             );
-            if (amountWithBreak - 2 > amountWithoutBreak) {
-              cmds.push(breakCommand);
+            if (priAmount * doc.switchRatio >= altAmount) {
+              cmds.push(priCmd);
             } else {
-              cmds.push(noBreakCommand);
+              cmds.push(altCmd);
             }
           }
           break;
