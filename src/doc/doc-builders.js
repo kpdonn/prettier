@@ -108,6 +108,22 @@ const breakParent = { type: "break-parent" };
 const line = { type: "line" };
 const softline = { type: "line", soft: true };
 const hardline = concat([{ type: "line", hard: true }, breakParent]);
+
+function moreCompact(primaryGroup, alternateGroup, linesToCheck, altPenalty) {
+  if (process.env.NODE_ENV !== "production") {
+    assertDoc(primaryGroup);
+    assertDoc(alternateGroup);
+  }
+
+  return {
+    type: "more-compact",
+    primaryGroup,
+    alternateGroup,
+    linesToCheck,
+    altPenalty
+  };
+}
+
 const literalline = concat([
   { type: "line", hard: true, literal: true },
   breakParent
@@ -150,6 +166,7 @@ module.exports = {
   line,
   softline,
   hardline,
+  moreCompact,
   literalline,
   group,
   conditionalGroup,
