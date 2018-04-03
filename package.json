@@ -1,12 +1,11 @@
 {
-  "name": "prettier",
-  "version": "1.11.1",
+  "name": "kpd-prettier",
+  "version": "10.12.0",
   "description": "Prettier is an opinionated code formatter",
   "bin": {
     "prettier": "./bin/prettier.js"
   },
-  "repository": "prettier/prettier",
-  "homepage": "https://prettier.io",
+  "repository": "kpdonn/prettier",
   "author": "James Long",
   "license": "MIT",
   "main": "./index.js",
